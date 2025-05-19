@@ -147,18 +147,18 @@ def update_sp(prediction, gold):
 def get_retr_output(test_raw_data, type='musique', is_dev=True, beam_size=1):
     retr_dic = {}
     if type == '2wiki':
-        re_tokenizer_path = 'model/deberta-v3-base'
+        re_tokenizer_path = 'microsoft/deberta-v3-large'
     else:
-        re_tokenizer_path = 'model/deberta-v3-large'
+        re_tokenizer_path = 'microsoft/deberta-v3-large'
     re_model_path = re_tokenizer_path
     if type == 'musique':
-        re_checkpoint = 'project/hotpotqa/retr_beamsize2_793.pt'
+        re_checkpoint = 'model/retr_beamsize2_793.pt'
     else:
-        re_checkpoint = 'project/hotpotqa/2407_codes/output/07-24-2023/train_2wiki_continue_training-seed42-bsz8-fp16True-lr1e-05-decay0.0-warm0.1-valbsz1/checkpoint_best.pt'
+        re_checkpoint = 'model/retr_beamsize2_793.pt'
     pred_filename = f"pred_test_{type}_v0_retr.json"
     max_len = 512
     mean_passage_len = 250 if type=='hotpot' else 120 
-    device = torch.device("cuda", 1)
+    device = torch.device("cuda", 0)
     tokenizer = AutoTokenizer.from_pretrained(re_tokenizer_path)
     config = AutoConfig.from_pretrained(re_tokenizer_path)
     config.cls_token_id = tokenizer.cls_token_id
@@ -255,7 +255,7 @@ def get_reader_qa_output(retr_pred_dic, test_raw_data, type='musique', is_dev=Tr
         qa_checkpoint = "project/hotpotqa/3107_codes/output/08-01-2023/musique_reader_deberta_large_from_scratch-seed42-bsz8-fp16True-lr6e-06-decay0.0-warm0.1-valbsz32/checkpoint_best.pt"
     pred_filename = f"sorted_pred_{'dev' if is_dev else 'test'}_{type}_v0_retrlarge_793_qalarge_70_{'merged' if answer_merge else 'no_merged'}.{'jsonl' if type=='musique' else 'json'}"
     max_len = 1024
-    device = torch.device("cuda", 1)
+    device = torch.device("cuda", 0)
     config = AutoConfig.from_pretrained(qa_model_path)
     config.max_position_embeddings = max_len
     tokenizer = AutoTokenizer.from_pretrained(qa_tokenizer_path)
@@ -429,7 +429,7 @@ if __name__ == '__main__':
     type = 'musique'
     # with open('project/hotpotqa/source_code/output/07-05-2023/train_2wiki_0-seed42-bsz8-fp16True-lr1e-05-decay0.0-warm0.1-valbsz1/pred_best.json', 'r') as f:
     #     retr_json = json.load(f)
-    test_file_path = f"data/datasets/mrc/musique/musique_ans_v1.0_{'dev' if is_dev else 'test'}.jsonl"
+    test_file_path = f"data/musique_ans_v1.0_{'dev' if is_dev else 'test'}.jsonl"
     # test_file_path = f"data/datasets/mrc/2wikimultihop/data/{'dev' if is_dev else 'test'}.json"
     # test_raw_data = json.load(open(test_file_path))
     musique_data = open(test_file_path).readlines()
