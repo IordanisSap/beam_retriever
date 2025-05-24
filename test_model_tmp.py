@@ -247,7 +247,7 @@ def merge_find_ans(start_logits, end_logits, ids, punc_token_list, topk=5, max_a
     return span_id
 
 def get_reader_qa_output(retr_pred_dic, test_raw_data, type='musique', is_dev=True, answer_merge=False, topk=5):
-    qa_tokenizer_path = "model/deberta-v3-large-squad2"
+    qa_tokenizer_path = "microsoft/deberta-v3-large"
     qa_model_path = qa_tokenizer_path
     if type == '2wiki':
         qa_checkpoint = 'project/hotpotqa/2107_codes/output/07-21-2023/2wiki_multi_reader_large-seed42-bsz4-fp16True-lr1e-05-decay0.0-warm0.1-valbsz32/checkpoint_best.pt'
@@ -426,13 +426,18 @@ def get_reader_qa_output(retr_pred_dic, test_raw_data, type='musique', is_dev=Tr
 
 if __name__ == '__main__':
     is_dev = True
-    type = 'musique'
+    # type = 'musique'
+    type = 'hotpot'
+
     # with open('project/hotpotqa/source_code/output/07-05-2023/train_2wiki_0-seed42-bsz8-fp16True-lr1e-05-decay0.0-warm0.1-valbsz1/pred_best.json', 'r') as f:
     #     retr_json = json.load(f)
-    test_file_path = f"data/musique_ans_v1.0_{'dev' if is_dev else 'test'}.jsonl"
-    # test_file_path = f"data/datasets/mrc/2wikimultihop/data/{'dev' if is_dev else 'test'}.json"
-    # test_raw_data = json.load(open(test_file_path))
-    musique_data = open(test_file_path).readlines()
-    test_raw_data = [json.loads(item) for item in musique_data]
+
+    # test_file_path = f"data/musique_ans_v1.0_{'dev' if is_dev else 'test'}.jsonl"
+
+    test_file_path = f"data/hotpot_dev_distractor_v1.json"
+    test_raw_data = json.load(open(test_file_path))
+
+    # musique_data = open(test_file_path).readlines()
+    # test_raw_data = [json.loads(item) for item in musique_data]
     retr_json = get_retr_output(test_raw_data, is_dev=is_dev, type=type, beam_size=2)
     get_reader_qa_output(retr_json, test_raw_data, is_dev=is_dev, type=type, answer_merge=True, topk=10)
